@@ -1,12 +1,15 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import session from "express-session";
 import "express-async-errors";
 import { json } from "body-parser";
 import cors from "cors";
-
-import { errorHandler, NotFoundError } from "@yablonka-services/err-and-middle";
+import { createTicketRouter } from "./routes/new";
+import {
+  currentUser,
+  errorHandler,
+  NotFoundError,
+} from "@yablonka-services/err-and-middle";
 import { env } from "./config/config";
-import "./config/passport-setup";
 
 const app = express();
 
@@ -24,8 +27,11 @@ app.use(
     },
   })
 );
+app.use(currentUser);
 
-app.all("*", async (_req: Request, res: Response) => {
+app.use(createTicketRouter);
+
+app.all("*", async (_req: Request, _res: Response) => {
   throw new NotFoundError();
 });
 
